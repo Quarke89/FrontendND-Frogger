@@ -43,10 +43,14 @@ var Engine = (function(global) {
 
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
-         */
-        update(dt);
-        render();
-
+         */        
+        if(gameOverMenu.active){
+            gameOverMenu.render();
+        } else {
+            update(dt);
+            render();
+        }
+                        
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
          */
@@ -78,8 +82,7 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
-        updateEntities(dt);
-        // checkCollisions();
+        updateEntities(dt);        
     }
 
     /* This is called by the update function and loops through all of the

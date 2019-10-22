@@ -47,23 +47,31 @@ Enemy.prototype.render = function () {
 // a handleInput() method.
 let Player = function () {
 
-    this.col = 2;
-    this.row = 5;
-
+    this.reset();
     this.sprite = 'images/char-boy.png';
 };
+
+Player.prototype.reset = function() {
+    this.col = 2;
+    this.row = 5;
+}
 
 Player.prototype.update = function () {
     
     if(this.checkCollision()){
-        this.col = 2;
-        this.row = 5;
         gameHUD.lives--;
+        if(gameHUD.lives === 0){
+            gameOverMenu.active = true;
+        }
+        this.reset();        
+    }
+    if(this.row === 0){
+        gameHUD.score++;
+        this.reset();
     }
 
     this.x = this.col * TILE_WIDTH;
-    this.y = (this.row * TILE_HEIGHT) - 20;
-    
+    this.y = (this.row * TILE_HEIGHT) - 20;    
 };
 
 Player.prototype.checkCollision = function() {
@@ -108,14 +116,37 @@ Player.prototype.handleInput = function (kbdInput) {
 };
 
 let GameHUD = function() {
-
     this.lives = 5;
     this.lifeSprite = 'images/Heart.png';
+    this.score = 0;        
 };
 
 GameHUD.prototype.render = function() {
     for(let i = 0; i < this.lives; i++){
         ctx.drawImage(Resources.get(this.lifeSprite), 3 + i*(101/3), ctx.canvas.height-65, 30, 50);
+    }
+
+    ctx.font = '32px impact';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'right';
+    ctx.fillText(this.score, ctx.canvas.width-5, ctx.canvas.height-26);    
+};
+
+
+let GameOverMenu = function() {
+    this.active = false;
+};
+
+GameOverMenu.prototype.render = function() {
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+};
+
+GameOverMenu.prototype.handleInput = function (kbdInput) {
+    switch (kbdInput) {
+        case 'enter':
+            this.active = false;
+            break;
     }
 };
 
@@ -126,6 +157,7 @@ GameHUD.prototype.render = function() {
 
 player = new Player();
 gameHUD = new GameHUD();
+gameOverMenu = new GameOverMenu();
 
 allEnemies = [];
 
@@ -142,8 +174,14 @@ document.addEventListener('keyup', function (e) {
         37: 'left',
         38: 'up',
         39: 'right',
-        40: 'down'
+        40: 'down',
+        13: 'enter'
     };
 
-    player.handleInput(allowedKeys[e.keyCode]);
+    if(gameOverMenu.active){        
+        gameOverMenu.handleInput(allowedKeys[e.keyCode]);
+    } else {        
+        player.handleInput(allowedKeys[e.keyCode]);
+    }
+    
 });
