@@ -51,16 +51,18 @@ let Player = function () {
     this.row = 5;
 
     this.sprite = 'images/char-boy.png';
-}
+};
 
 Player.prototype.update = function () {
-    this.x = this.col * TILE_WIDTH;
-    this.y = (this.row * TILE_HEIGHT) - 20;
-
+    
     if(this.checkCollision()){
         this.col = 2;
         this.row = 5;
+        gameHUD.lives--;
     }
+
+    this.x = this.col * TILE_WIDTH;
+    this.y = (this.row * TILE_HEIGHT) - 20;
     
 };
 
@@ -68,7 +70,7 @@ Player.prototype.checkCollision = function() {
     for(let i = 0; i < numEnemies; i++){
         let enemy = allEnemies[i];
         if(enemy.row == this.row){
-            if(!(this.x + TILE_WIDTH <= enemy.x) && !(this.x >= enemy.x + TILE_WIDTH)){
+            if(!(this.x + TILE_WIDTH - 30 <= enemy.x) && !(this.x + 30 >= enemy.x + TILE_WIDTH)){
                 return true;
             }
         }
@@ -105,12 +107,26 @@ Player.prototype.handleInput = function (kbdInput) {
     }
 };
 
+let GameHUD = function() {
+
+    this.lives = 5;
+    this.lifeSprite = 'images/Heart.png';
+};
+
+GameHUD.prototype.render = function() {
+    for(let i = 0; i < this.lives; i++){
+        ctx.drawImage(Resources.get(this.lifeSprite), 3 + i*(101/3), ctx.canvas.height-65, 30, 50);
+    }
+};
+
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
 player = new Player();
+gameHUD = new GameHUD();
+
 allEnemies = [];
 
 const numEnemies = 4;
