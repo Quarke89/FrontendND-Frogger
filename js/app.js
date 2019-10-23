@@ -14,6 +14,9 @@ var Enemy = function () {
     this.sprite = 'images/enemy-bug.png';
 };
 
+// randomly initialize the position and speed of the enemy
+// speed is between 150 - 450
+// position is randomly picked between 1 of the 3 lanes
 Enemy.prototype.reset = function() {
     this.x = Math.floor(Math.random() * 100) - 150;
 
@@ -31,6 +34,8 @@ Enemy.prototype.update = function (dt) {
     // all computers.
 
     this.x += this.speed * dt;    
+    
+    // if the enemy goes beyond the canvas, reset its parameters
     if(this.x >= ctx.canvas.width){
         this.reset();
     }
@@ -51,11 +56,15 @@ let Player = function () {
     this.sprite = 'images/char-boy.png';
 };
 
+// starting position of the player is the bottom center of the canvas
 Player.prototype.reset = function() {
     this.col = 2;
     this.row = 5;
 }
 
+// Update the player's position based on current grid position
+// check for collisions and update lives
+// check if player has reached the end to win round
 Player.prototype.update = function () {
     
     if(this.checkCollision()){
@@ -74,6 +83,9 @@ Player.prototype.update = function () {
     this.y = (this.row * TILE_HEIGHT) - 20;    
 };
 
+// check if the player is colliding with any enemies
+// player has to be in the same row as the enemy and check if the
+// left and right edge of the bounding box overlaps with the enemy
 Player.prototype.checkCollision = function() {
     for(let i = 0; i < numEnemies; i++){
         let enemy = allEnemies[i];
@@ -86,10 +98,13 @@ Player.prototype.checkCollision = function() {
     return false;
 };
 
+// Draw player sprite
 Player.prototype.render = function () {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+// Handle keyboard input and change the player position accordingly
+// Prevent player from going off bounds
 Player.prototype.handleInput = function (kbdInput) {
     switch (kbdInput) {
         case 'up':
@@ -115,6 +130,8 @@ Player.prototype.handleInput = function (kbdInput) {
     }
 };
 
+// Object for HUD (heads up display) information
+// Displays number of lives left and current score
 let GameHUD = function() {
     this.lives = 5;
     this.lifeSprite = 'images/Heart.png';
@@ -126,6 +143,8 @@ GameHUD.prototype.reset = function() {
     this.score = 0;
 }
 
+// Render hearts based on number of lives left
+// display score on the bottom right
 GameHUD.prototype.render = function() {
     for(let i = 0; i < this.lives; i++){
         ctx.drawImage(Resources.get(this.lifeSprite), 3 + i*(101/3), ctx.canvas.height-65, 30, 50);
@@ -137,11 +156,12 @@ GameHUD.prototype.render = function() {
     ctx.fillText(this.score, ctx.canvas.width-5, ctx.canvas.height-26);    
 };
 
-
+// Object for the game over manu that is displayed when all lives are lost
 let GameOverMenu = function() {
     this.active = false;
 };
 
+// Render game over menu
 GameOverMenu.prototype.render = function() {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -154,10 +174,10 @@ GameOverMenu.prototype.render = function() {
     ctx.fillText("Final Score: " + gameHUD.score, ctx.canvas.width/2, ctx.canvas.height/2+20);
     ctx.fillText("Press Enter to play again...", ctx.canvas.width/2, ctx.canvas.height/2+50);    
 
-
-
 };
 
+// Handle keyboard input when game over menu is active
+// Check if enter is pressed to deactivate the menu and reset the game
 GameOverMenu.prototype.handleInput = function (kbdInput) {
     switch (kbdInput) {
         case 'enter':
@@ -178,7 +198,6 @@ gameHUD = new GameHUD();
 gameOverMenu = new GameOverMenu();
 
 allEnemies = [];
-
 const numEnemies = 4;
 for(let i = 0; i < numEnemies; i++){
     allEnemies.push(new Enemy());

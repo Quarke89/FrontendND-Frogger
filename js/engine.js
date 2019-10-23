@@ -43,7 +43,7 @@ var Engine = (function(global) {
 
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
-         */        
+         * Skip redering the game if the game over menu is active */        
         if(gameOverMenu.active){
             gameOverMenu.render();
         } else {
