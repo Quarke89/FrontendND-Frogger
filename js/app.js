@@ -121,6 +121,11 @@ let GameHUD = function() {
     this.score = 0;        
 };
 
+GameHUD.prototype.reset = function() {
+    this.lives = 5;
+    this.score = 0;
+}
+
 GameHUD.prototype.render = function() {
     for(let i = 0; i < this.lives; i++){
         ctx.drawImage(Resources.get(this.lifeSprite), 3 + i*(101/3), ctx.canvas.height-65, 30, 50);
@@ -140,12 +145,25 @@ let GameOverMenu = function() {
 GameOverMenu.prototype.render = function() {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    ctx.font = '42px impact';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.fillText("Game Over", ctx.canvas.width/2, ctx.canvas.height/2-20);
+    ctx.font = '20px impact';
+    ctx.fillText("Final Score: " + gameHUD.score, ctx.canvas.width/2, ctx.canvas.height/2+20);
+    ctx.fillText("Press Enter to play again...", ctx.canvas.width/2, ctx.canvas.height/2+50);    
+
+
+
 };
 
 GameOverMenu.prototype.handleInput = function (kbdInput) {
     switch (kbdInput) {
         case 'enter':
             this.active = false;
+            player.reset();
+            gameHUD.reset();
             break;
     }
 };
